@@ -51,7 +51,9 @@ npm run dev
 
 * Note: This game requires a physical keyboard and is restricted to desktop browsers to ensure the best possible player experience.
 
+<img width="1905" height="941" alt="image" src="https://github.com/user-attachments/assets/e1351f49-05ab-403a-bb10-4b438425a320" />
 <img width="1907" height="999" alt="image" src="https://github.com/user-attachments/assets/e5064250-be2c-4f77-9104-16c0a4e33aed" />
+
 
 
 
