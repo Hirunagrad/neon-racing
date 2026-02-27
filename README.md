@@ -48,7 +48,8 @@ npm run dev
 ```
 
 👨‍💻 Developed By
-* **Hiruna ---
-* **Note: This game requires a physical keyboard and is restricted to desktop browsers to ensure the best possible player experience.
+* Hiruna ---
+* Note: This game requires a physical keyboard and is restricted to desktop browsers to ensure the best possible player experience.
+
 
 
