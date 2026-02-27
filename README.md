@@ -34,3 +34,20 @@ Designed with a focus on both gameplay feel and extreme rendering performance, t
 ```bash
 git clone https://github.com/yourusername/neon-racer-3d.git
 cd neon-racer-3d
+```
+**2. Install dependencies:**
+
+```bash
+npm install
+```
+
+**3. Start the development server:**
+
+```bash
+npm run dev
+```
+
+👨‍💻 Developed By
+Hiruna ---
+Note: This game requires a physical keyboard and is restricted to desktop browsers to ensure the best possible player experience.
+
