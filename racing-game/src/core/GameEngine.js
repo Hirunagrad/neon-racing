@@ -85,6 +85,7 @@ export default class GameEngine {
         let myIndex = playerArray.findIndex(p => p.id === this.socket.id);
         if(myIndex === -1) myIndex = 0;
         
+        // --- NEW: Grab our custom name from the array! ---
         let myName = playerArray[myIndex] ? playerArray[myIndex].playerName : "You";
 
         let myStartX = startPos.player.x + (myIndex % 2 === 0 ? 4 : -4);
@@ -138,6 +139,8 @@ export default class GameEngine {
                 let netStartX = startPos.player.x + (index % 2 === 0 ? 4 : -4);
                 let netStartZ = startPos.player.z + (Math.floor(index / 2) * 12);
                 let netConfig = CAR_CONFIGS[p.carIndex];
+                
+                // --- NEW: Apply the network player's custom name ---
                 let netName = p.playerName || `Player ${index+1}`;
 
                 const netCar = new Car3D(this.scene, netConfig, netStartX, netStartZ, true, netConfig.color, netName);
@@ -401,7 +404,6 @@ export default class GameEngine {
     document.getElementById("pause-layer").classList.add("hidden");
     document.getElementById("hud").classList.add("hidden");
     
-    // THE CRITICAL FIX: Safe return to the menu!
     document.getElementById("menu-screen").classList.remove("hidden");
     document.getElementById("nos-container").style.display = 'block';
   }

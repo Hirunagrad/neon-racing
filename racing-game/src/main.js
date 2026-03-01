@@ -12,7 +12,7 @@ let selectedDifficulty = 1;
 let selectedMap = 0; 
 let inMenu = true; 
 
-const socket = io('http://localhost:3000');
+const socket = io('https://neon-racer-multiplayer.onrender.com');
 let currentRoomId = null;
 let isHost = false;
 
