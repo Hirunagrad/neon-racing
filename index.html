@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Racing Game - Pro Edition</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00ffff; --secondary: #ff0055; --accent: #ffeb3b;
+            --dark-glass: rgba(15, 15, 20, 0.85); --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body { 
+            margin: 0; overflow: hidden; background-color: #050505; 
+            font-family: 'Rajdhani', sans-serif; color: white; user-select: none;
+        }
+        
+        #game-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; }
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* ========================================= */
+        /* AAA NEON SYNTHWAVE BACKGROUND SYSTEM      */
+        /* ========================================= */
+        .menu-screen {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10; transition: opacity 0.4s ease; overflow: hidden;
+            background: radial-gradient(circle at center, rgba(15,15,25,0.7) 0%, rgba(5,5,10,0.98) 100%);
+            backdrop-filter: blur(8px);
+        }
+
+        .glow-cyan { position: absolute; top: -10vw; left: -10vw; width: 40vw; height: 40vw; background: rgba(0, 255, 255, 0.15); filter: blur(120px); border-radius: 50%; pointer-events: none; z-index: 0;}
+        .glow-pink { position: absolute; bottom: -10vw; right: -10vw; width: 40vw; height: 40vw; background: rgba(255, 0, 85, 0.15); filter: blur(120px); border-radius: 50%; pointer-events: none; z-index: 0;}
+
+        .synth-grid {
+            position: absolute; bottom: 0; left: 0; width: 100vw; height: 40vh;
+            background: linear-gradient(transparent 95%, rgba(0, 255, 255, 0.2) 100%), linear-gradient(90deg, transparent 95%, rgba(0, 255, 255, 0.2) 100%);
+            background-size: 50px 50px;
+            transform: perspective(600px) rotateX(75deg) scale(2.5);
+            transform-origin: bottom center;
+            animation: gridScroll 1.5s linear infinite;
+            pointer-events: none; z-index: 0;
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
+        }
+        @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
+
+        /* ========================================= */
+        /* TWO-COLUMN PRO LAYOUT                     */
+        /* ========================================= */
+        .layout-container {
+            position: relative; z-index: 2; width: 100%; height: 100%;
+            display: flex; max-width: 1600px; margin: 0 auto; box-sizing: border-box;
+            padding: 4vh 4vw; gap: 4vw;
+        }
+
+        /* LEFT SIDE: Navigation Stack */
+        .left-column {
+            flex: 0 0 450px; display: flex; flex-direction: column; 
+            justify-content: center; height: 100%; position: relative;
+        }
+        
+        .scroll-wrapper {
+            overflow-y: auto; padding-right: 10px; scrollbar-width: none;
+            display: flex; flex-direction: column; padding-bottom: 20px;
+        }
+        .scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        /* RIGHT SIDE: Massive Car Showcase */
+        .right-column {
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+        }
+
+        .game-title { font-size: clamp(50px, 4vw, 75px); font-weight: 900; margin-bottom: 4vh; color: #fff; text-shadow: 0 0 15px var(--primary), 4px 4px 0px var(--secondary); transform: skewX(-10deg); line-height: 0.9;}
+        .game-title span { color: transparent; -webkit-text-stroke: 2px var(--primary); }
+
+        .menu-block {
+            background: var(--dark-glass); border-left: 5px solid var(--primary);
+            padding: 20px 25px; margin-bottom: 15px; transform: skewX(-5deg);
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+        }
+        .menu-block > * { transform: skewX(5deg); }
+
+        .section-title { font-size: 16px; color: #aaa; margin-bottom: 15px; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 8px;}
+        
+        .selection-grid { display: flex; gap: 10px; width: 100%; }
+        .selection-card {
+            flex: 1; background: rgba(0,0,0,0.6); border: 1px solid #333; 
+            padding: 15px 5px; text-align: center; cursor: pointer; 
+            transition: 0.2s; border-radius: 4px;
+        }
+        .selection-card h3 { font-size: 16px; margin:0; }
+        .selection-card div { font-size: 11px; color: #888; margin-top: 4px; font-weight: bold;}
+        .selection-card:hover:not(.disabled) { background: rgba(30,30,40,0.9); border-color: #666; }
+        .selection-card.selected { border-color: var(--primary); background: rgba(0, 255, 255, 0.1); box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1); }
+        .selection-card.disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .action-btn {
+            background: linear-gradient(90deg, var(--primary), #0088ff); color: #000;
+            font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 900;
+            padding: 20px; border: none; cursor: pointer; transform: skewX(-10deg);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3); transition: 0.3s;
+            width: 100%; margin-top: 10px; text-transform: uppercase;
+        }
+        .action-btn:hover { filter: brightness(1.3); transform: skewX(-10deg) scale(1.02); box-shadow: 0 10px 40px rgba(0, 255, 255, 0.6); }
+        
+        .action-btn.secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); box-shadow: inset 0 0 15px rgba(0,255,255,0.1); }
+        .action-btn.secondary:hover { background: var(--primary); color: #000; }
+        .action-btn.danger { background: transparent; color: var(--secondary); border: 2px solid var(--secondary); box-shadow: none; font-size: 18px; padding: 15px; margin-top: 20px;}
+        .action-btn.danger:hover { background: var(--secondary); color: #fff; }
+
+        .cyber-input {
+            width: 100%; padding: 15px; font-size: 20px; font-family: 'Orbitron'; 
+            text-align: center; background: rgba(0,0,0,0.8); border: 2px solid var(--accent); 
+            color: var(--accent); outline: none; border-radius: 4px; 
+            margin-bottom: 15px; text-transform: uppercase; box-sizing: border-box;
+        }
+        .cyber-input.code { border-color: var(--primary); color: var(--primary); }
+
+        /* --- Right Column Showcase Styling --- */
+        .showcase-header { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 2vh;}
+        .nav-btn { background: transparent; border: none; color: white; font-size: 50px; cursor: pointer; transition: 0.2s; text-shadow: 0 0 15px var(--primary); }
+        .nav-btn:hover { color: var(--primary); transform: scale(1.2); }
+        #car-display-name { font-size: 40px; letter-spacing: 4px; text-shadow: 0 0 20px rgba(0,255,255,0.5); margin: 0 20px;}
+
+        #car-showcase { width: 100%; height: 45vh; min-height: 300px; display: flex; justify-content: center; align-items: center; }
+        #car-showcase canvas { width: 100% !important; height: 100% !important; object-fit: contain; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.9)); }
+
+        .car-stats-panel { background: var(--dark-glass); border-top: 3px solid var(--primary); padding: 20px 40px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); margin-top: 2vh;}
+        .stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 16px; font-weight: 600; color: #ccc; font-family: 'Orbitron';}
+        .stat-bar { width: 60%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .stat-fill { height: 100%; border-radius: 4px; box-shadow: 0 0 10px currentColor; transition: width 0.4s ease; }
+
+        #pause-layer, #results-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 30; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); transition: 0.3s;}
+        .results-box { background: var(--dark-glass); padding: 40px 60px; border-radius: 16px; border: 1px solid var(--primary); text-align: center; width: clamp(300px, 80vw, 600px); box-sizing: border-box; box-shadow: 0 0 50px rgba(0,255,255,0.1);}
+        
+        .hud { position: absolute; top: 30px; left: 30px; font-size: 28px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 5; background: rgba(0,0,0,0.4); padding: 15px 25px; border-radius: 8px; border-left: 4px solid var(--primary); backdrop-filter: blur(5px); }
+        .hud-val { font-family: 'Orbitron', sans-serif; color: var(--accent); }
+        #pause-toggle-btn { position: absolute; top: 30px; right: 30px; font-size: 30px; z-index: 5; background: rgba(0,0,0,0.5); border: 2px solid #aaa; color: #aaa; border-radius: 8px; padding: 10px 20px; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px); font-family: 'Orbitron', sans-serif;}
+        #pause-toggle-btn:hover { border-color: var(--primary); color: var(--primary); box-shadow: 0 0 15px var(--primary); }
+        .speedo-container { position: absolute; bottom: 40px; right: 40px; text-align: right; background: rgba(0,0,0,0.5); padding: 15px 30px; border-radius: 8px; border-right: 4px solid var(--primary); backdrop-filter: blur(5px); }
+        .speedo-val { font-family: 'Orbitron', sans-serif; font-size: 50px; color: white; text-shadow: 0 0 15px var(--primary); line-height: 1;}
+        #nos-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: clamp(250px, 40vw, 400px); height: 12px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; z-index: 5; }
+        #nos-bar { height: 100%; transition: width 0.1s linear, background 0.3s; }
+        #speed-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 0px rgba(0, 255, 255, 0); transition: 0.3s; pointer-events: none; z-index: 2; }
+        .boosting { box-shadow: inset 0 0 150px rgba(0, 255, 255, 0.4) !important; }
+        #countdown-display, #finish-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: clamp(80px, 15vw, 180px); font-weight: 900; font-family: 'Orbitron', sans-serif; color: var(--accent); text-shadow: 0 0 40px rgba(255, 235, 59, 0.5), 5px 5px 0 #000; z-index: 20; transition: 0.2s; }
+        .pop { transform: translate(-50%, -50%) scale(1.3) !important; }
+        .dev-credit { position: absolute; bottom: 15px; left: 20px; font-family: 'Orbitron', sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; pointer-events: none; line-height: 1.6; z-index: 100;}
+        .dev-credit span { color: var(--primary); opacity: 0.6; }
+
+        #mobile-blocker { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+        #mobile-blocker h1 { font-size: 40px; color: var(--secondary); text-shadow: 0 0 20px rgba(255,0,85,0.6); margin-bottom: 20px; transform: skewX(-10deg); }
+        @media (hover: none) and (pointer: coarse) { #mobile-blocker { display: flex; } #game-container, .menu-screen, #hud, #speed-lines { display: none !important; } }
+        
+        @media (max-width: 1000px) {
+            .layout-container { flex-direction: column; align-items: center; overflow-y: auto; overflow-x: hidden;}
+            .left-column { width: 100%; flex: none; align-items: center;}
+            .right-column { width: 100%; flex: none; margin-top: 4vh;}
+            .menu-block, .action-btn { width: 90vw; max-width: 500px; }
+            .game-title { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="mobile-blocker"><div style="font-size: 60px;">⌨️</div><h1>DESKTOP ONLY</h1><p style="color: #ccc; font-family: 'Orbitron', sans-serif;">Neon Racer requires a physical keyboard to play.</p></div>
+<div id="game-container"></div>
+<div id="speed-lines"></div>
+<div id="countdown-display" class="hidden">3</div>
+<div id="finish-display" class="hidden">FINISH!</div>
+
+<div id="hud" class="hidden">
+    <div class="hud">
+        <div>TIME <span id="time-display" class="hud-val">0.00</span></div>
+        <div>LAP <span id="lap-counter" class="hud-val">0</span><span style="color:#aaa; font-size: 20px;">/3</span></div>
+        <div style="margin-top: 10px; font-size: 20px;">POS <span id="position-display" class="hud-val" style="font-size: 28px;">1st</span></div>
+    </div>
+    <button id="pause-toggle-btn">|| PAUSE</button>
+    <div class="speedo-container"><div class="speedo-val" id="speed-display">0</div><div style="color: #aaa; font-size: 16px;">KM/H</div></div>
+    <div id="nos-container"><div id="nos-bar" style="width: 100%; background: linear-gradient(90deg, #00ffff, #0055ff);"></div></div>
+</div>
+
+<div id="pause-layer" class="hidden">
+    <h2 style="font-size: 60px; color: var(--accent); font-family: 'Orbitron', sans-serif; margin-bottom: 4vh; text-shadow: 0 0 20px rgba(255,235,59,0.5);">GAME PAUSED</h2>
+    <p id="online-pause-warning" class="hidden" style="color: #ff4757; font-size: 18px; margin-top: -2vh; margin-bottom: 3vh;">You are online. The race is still running in the background!</p>
+    <button id="resume-btn" class="action-btn" style="width: 350px;">RESUME</button>
+    <button id="restart-btn" class="action-btn secondary hidden" style="width: 350px; border-color: var(--accent); color: var(--accent);">RESTART MATCH</button>
+    <button id="quit-btn" class="action-btn danger" style="width: 350px;">QUIT TO MENU</button>
+</div>
+
+<div id="menu-screen" class="menu-screen">
+    <div class="glow-cyan"></div>
+    <div class="glow-pink"></div>
+    <div class="synth-grid"></div>
+
+    <div class="layout-container">
+        
+        <div class="left-column">
+            <div class="scroll-wrapper">
+                <h1 class="game-title">NEON <br><span>RACER</span></h1>
+
+                <div id="view-main">
+                    <div class="menu-block">
+                        <div class="section-title">GAME MODE</div>
+                        <div class="selection-grid" id="mode-select">
+                            <div class="selection-card selected" data-mode="offline"><h3>OFFLINE</h3><div>RACE AI BOTS</div></div>
+                            <div class="selection-card" data-mode="online"><h3>ONLINE</h3><div>MULTIPLAYER</div></div>
+                        </div>
+                    </div>
+
+                    <div class="menu-block">
+                        <div class="section-title">SELECT TRACK</div>
+                        <div class="selection-grid" id="map-select">
+                            <div class="selection-card selected" data-map="0"><h3>FOREST RING</h3><div>DAYTIME</div></div>
+                            <div class="selection-card disabled"><h3>DESERT DUNE</h3><div>LOCKED</div></div>
+                        </div>
+                    </div>
+
+                    <div class="menu-block" id="difficulty-section" style="transition: 0.3s;">
+                        <div class="section-title">AI DIFFICULTY</div>
+                        <div class="selection-grid" id="diff-select">
+                            <div class="selection-card" data-diff="0"><h3 style="color:#2ed573;">ROOKIE</h3></div>
+                            <div class="selection-card selected" data-diff="1"><h3 style="color:#ffeb3b;">PRO</h3></div>
+                            <div class="selection-card" data-diff="2"><h3 style="color:#ff4757;">VETERAN</h3></div>
+                        </div>
+                    </div>
+
+                    <button id="start-btn" class="action-btn">START ENGINE</button>
+                </div>
+
+                <div id="view-lobby-join" class="hidden">
+                    <div class="menu-block">
+                        <div class="section-title">PLAYER PROFILE</div>
+                        <input type="text" id="player-name-input" class="cyber-input" placeholder="ENTER YOUR NAME" maxlength="12">
+                        <button id="create-room-btn" class="action-btn secondary">HOST PRIVATE ROOM</button>
+                    </div>
+
+                    <div class="menu-block" style="border-color: var(--secondary);">
+                        <div class="section-title">JOIN FRIENDS</div>
+                        <input type="text" id="room-code-input" class="cyber-input code" placeholder="ENTER 4-LETTER CODE" maxlength="4">
+                        <div id="room-error" style="color: #ff4757; font-weight: bold; margin-bottom: 10px; text-align: center;"></div>
+                        <button id="join-room-btn" class="action-btn" style="background: linear-gradient(90deg, var(--secondary), #ff00aa); box-shadow: 0 10px 30px rgba(255,0,85,0.3);">JOIN ROOM</button>
+                    </div>
+
+                    <button id="lobby-back-btn" class="action-btn danger">❮ BACK TO MAIN MENU</button>
+                </div>
+
+                <div id="view-room" class="hidden">
+                    <div class="menu-block" style="border-color: var(--accent);">
+                        <div class="section-title">ROOM CODE</div>
+                        <h2 style="color: #fff; font-family: 'Orbitron'; font-size: 40px; text-align: center; margin: 10px 0; letter-spacing: 5px;" id="display-room-code">----</h2>
+                    </div>
+
+                    <div class="menu-block">
+                        <div class="section-title">RACER ROSTER</div>
+                        <div id="players-list" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                            </div>
+                    </div>
+
+                    <button id="start-race-btn" class="action-btn hidden">LAUNCH RACE</button>
+                    <p id="waiting-host-msg" style="color: var(--accent); font-family: 'Orbitron'; font-size: 18px; text-align: center; margin: 20px 0;">WAITING FOR HOST TO START...</p>
+                    
+                    <button id="leave-room-btn" class="action-btn danger">❮ LEAVE ROOM</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="showcase-header">
+                <button id="prev-car" class="nav-btn">❮</button>
+                <h2 id="car-display-name">STRIKER</h2>
+                <button id="next-car" class="nav-btn">❯</button>
+            </div>
+
+            <div id="car-showcase"></div>
+
+            <div class="car-stats-panel">
+                <div class="stat-row"><span>SPEED</span><div class="stat-bar"><div id="stat-spd" class="stat-fill"></div></div></div>
+                <div class="stat-row"><span>ACCEL</span><div class="stat-bar"><div id="stat-acc" class="stat-fill"></div></div></div>
+                <div class="stat-row"><span>HANDLING</span><div class="stat-bar"><div id="stat-hdl" class="stat-fill"></div></div></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="dev-credit">VERSION 1.0.0<br>DEVELOPED BY <span style="font-weight:bold;">HIRUNA</span></div>
+</div>
+
+<div id="results-layer" class="hidden">
+    <div class="results-box">
+        <h2 style="font-size: 40px; color: white; margin-bottom: 3vh; font-family: 'Orbitron', sans-serif;">FINAL STANDINGS</h2>
+        <table id="results-table" style="width:100%; margin-bottom: 3vh; font-size: 22px; color: white; text-align: left; border-collapse: collapse;">
+            <tbody id="results-body"></tbody>
+        </table>
+        <button id="menu-btn" class="action-btn" style="width: 100%;">LEAVE MATCH</button>
+    </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
