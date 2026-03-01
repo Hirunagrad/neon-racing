@@ -1,4 +1,4 @@
-# 🏎️ Neon Racer 3D
+��# 🏎️ Neon Racer 3D
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Three.js](https://img.shields.io/badge/three.js-r150+-black.svg?style=flat&logo=three.js)
@@ -10,7 +10,7 @@ Designed with a focus on both gameplay feel and extreme rendering performance, t
 
 ## ✨ Features
 
-* **Advanced Engine & Physics:** Custom vehicle physics with drifting, friction, and a manual Nitrous (NOS) system featuring a cooldown/overheat lockout mechanic.
+* **Advanced Engine & Physics:** Custom vehicle physics with drifting, friction, and a manual Nitrous (NOSsystem featuring a cooldown/overheat lockout mechanic.
 * **Smart AI Opponents:** AI racers dynamically calculate trajectories, adjust speed for corners, and physically use their own Nitrous boosts on straightaways on "Veteran" difficulty.
 * **Extreme Optimization:** Engineered for a locked 60 FPS on standard hardware.
   * **Object Pooling:** Zero garbage-collection memory leaks. Exhaust particles and skidmarks are pooled and recycled.
