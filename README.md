@@ -2,7 +2,7 @@
 
 Neon Racer is a high-octane, synthwave-inspired 3D racing game built for the web. Compete against adaptive AI or challenge your friends in real-time private multiplayer lobbies.
 
-![Neon Racer Cover](https://ibb.co/kgN8RK32)
+![Neon Racer Cover]('https://ibb.co/kgN8RK32')
 
 ## 🌟 Key Features
 
