@@ -34,6 +34,7 @@ Neon Racer is a high-octane, synthwave-inspired 3D racing game built for the web
 ```bash
 git clone [https://github.com/YOUR_USERNAME/neon-racer.git](https://github.com/YOUR_USERNAME/neon-racer.git)
 cd neon-racer
+```
 
 ### 🛠️ Backend Server
 The multiplayer functionality is powered by the [Neon Racer Server](https://github.com/Hirunagrad/car-racing-server). 
