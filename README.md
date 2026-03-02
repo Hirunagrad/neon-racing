@@ -32,7 +32,7 @@ Neon Racer is a high-octane, synthwave-inspired 3D racing game built for the web
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/neon-racer.git](https://github.com/YOUR_USERNAME/neon-racer.git)
+git clone [https://github.com/Hirunagrad/neon-racer.git](https://github.com/Hirunagrad/neon-racer.git)
 cd neon-racer
 ```
 
